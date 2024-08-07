@@ -1,0 +1,148 @@
+
+.container {
+  position: relative;
+
+  .childWrapper {
+    position: relative;
+    width: inherit;
+    height: inherit;
+    overflow: hidden;
+  }
+}
+
+.slider {
+  position: absolute;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  width: var(--resizer-width, 16px);
+  inset-block-end: 0;
+  inset-block-start: 0;
+  inset-inline-start: 100%;
+
+  &:hover {
+    opacity: 1;
+
+    .toggleButton {
+      opacity: 1;
+    }
+  }
+
+  &.right,
+  &.left {
+    top: 0;
+    bottom: 0;
+    cursor: ew-resize;
+  }
+
+  &.right {
+    right: 0;
+  }
+
+  &.left {
+    left: 0;
+  }
+
+  &.top,
+  &.bottom {
+    left: 0;
+    right: 0;
+    height: 3px;
+    cursor: ns-resize;
+  }
+
+  &.top {
+    top: 0;
+  }
+
+  &.bottom {
+    bottom: 0;
+  }
+}
+
+.resizer {
+  width: 100%;
+  height: 100%;
+  cursor: inherit;
+
+  span {
+    display: block;
+    width: 3px;
+    height: 100%;
+    background-color: transparent;
+    transition: background-color 0.3s;
+  }
+
+  &:hover span {
+    background-color: lightblue;
+  }
+}
+
+.animating {
+  transition-property: width, height;
+}
+
+.shadow {
+  position: absolute;
+  background-color: var(--resizer-color, hsl(214, 10%, 93%));
+
+  .right &,
+  .left & {
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    height: 100%;
+  }
+}
+
+.toggleButton {
+  position: absolute;
+  background: none;
+  border: none;
+  color: #fff;
+  background-color: var(--primary-color, hsl(0, 0%, 16%));
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+
+  &.hidden {
+    opacity: 0;
+  }
+
+  &:hover {
+    color: var(--primary-color / h s l 20%, hsla(0, 0%, 16%, 0.741));
+  }
+
+  .right &,
+  .left & {
+    top: 1rem;
+  }
+
+  .right & {
+    transform: translateX(-49%);
+  }
+
+  .left & {
+    transform: translateX(49%);
+  }
+
+  .top &,
+  .bottom & {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .top & {
+    bottom: 0;
+  }
+
+  .bottom & {
+    top: 0;
+  }
+}

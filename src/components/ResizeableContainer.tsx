@@ -1,12 +1,14 @@
 import React, {
   FC,
   ReactNode,
-  useRef,
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
-import styles from "./ResizeableContainer.module.css";
+import classNames from "classnames";
+import styles from "./ResizeableContainer.module.scss";
+import { useResize } from "../hooks/useResize";
 
 type Props = {
   children: ReactNode;
@@ -19,9 +21,14 @@ type Props = {
   onResize?: (size: number) => void;
   animationDuration?: number;
   storageKey: string;
+  ariaLabel?: string;
+  containerClassName?: string;
+  childWrapperClassName?: string;
+  sliderClassName?: string;
+  toggleButtonClassName?: string;
 };
 
-const ResizeableContainer: FC<Props> = ({
+const ResizableContainer: FC<Props> = ({
   children,
   direction = "right",
   initialSize,
@@ -32,62 +39,34 @@ const ResizeableContainer: FC<Props> = ({
   toggleKey,
   animationDuration = 300,
   storageKey,
+  ariaLabel,
+  containerClassName,
+  childWrapperClassName,
+  sliderClassName,
+  toggleButtonClassName,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<number | null>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [startMousePos, setStartMousePos] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const {
+    containerRef,
+    size,
+    isAnimating,
+    handleMouseDown,
+    handleMouseUp,
+    toggleCollapse,
+    isHorizontal,
+  } = useResize({
+    direction,
+    initialSize,
+    minSize,
+    maxSize,
+    boundSize,
+    onResize,
+    animationDuration,
+    storageKey,
+  });
+
   const [isButtonVisible, setIsButtonVisible] = useState(true);
-
-  const minSizeNum =
-    typeof minSize === "string" ? parseInt(minSize, 10) : minSize || 0;
-  const maxSizeNum =
-    typeof maxSize === "string" ? parseInt(maxSize, 10) : maxSize;
-  const boundSizeNum =
-    typeof boundSize === "string" ? parseInt(boundSize, 10) : boundSize || 0;
-
-  const isHorizontal = direction === "right" || direction === "left";
-
-  useEffect(() => {
-    const storedData = localStorage.getItem(storageKey);
-    let storedSize: number | null = null;
-    let storedPreviousSize: number | null = null;
-
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      storedSize = parsedData.currentSize || null;
-      storedPreviousSize = parsedData.previousSize || null;
-    }
-
-    if (containerRef.current) {
-      const containerSize = isHorizontal
-        ? containerRef.current.offsetWidth
-        : containerRef.current.offsetHeight;
-      const initialSizeNum =
-        storedSize !== null
-          ? storedSize
-          : initialSize !== undefined
-          ? typeof initialSize === "string"
-            ? parseInt(initialSize, 10)
-            : initialSize
-          : Math.max(containerSize, boundSizeNum);
-
-      setSize(initialSizeNum);
-      if (storedPreviousSize === null) {
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            currentSize: initialSizeNum,
-            previousSize: initialSizeNum,
-          })
-        );
-      }
-    }
-  }, [direction, boundSizeNum, isHorizontal, storageKey, initialSize]);
+  const [isToggleButtonClicked, setIsToggleButtonClicked] = useState(false);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -95,104 +74,6 @@ const ResizeableContainer: FC<Props> = ({
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, []);
-
-  console.log(isButtonVisible);
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-    setIsAnimating(false);
-    setStartMousePos({ x: e.clientX, y: e.clientY });
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    setIsResizing(false);
-    setSize((currentSize) => {
-      if (currentSize !== null) {
-        const newSize = currentSize < boundSizeNum ? minSizeNum : currentSize;
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            currentSize: newSize,
-            previousSize: Math.max(newSize, boundSizeNum),
-          })
-        );
-        if (currentSize < boundSizeNum) {
-          setIsAnimating(true);
-          setTimeout(() => setIsAnimating(false), animationDuration);
-          return minSizeNum;
-        }
-      }
-      return currentSize;
-    });
-  }, [storageKey, boundSizeNum, animationDuration, minSizeNum]);
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (isResizing && containerRef.current && startMousePos) {
-        const offsetX = e.clientX - startMousePos.x;
-        const offsetY = e.clientY - startMousePos.y;
-
-        let newSize: number;
-        if (isHorizontal) {
-          newSize = (size || 0) + (direction === "right" ? offsetX : -offsetX);
-        } else {
-          newSize = (size || 0) + (direction === "bottom" ? offsetY : -offsetY);
-        }
-
-        newSize = Math.max(newSize, minSizeNum);
-        if (maxSizeNum !== undefined) {
-          newSize = Math.min(newSize, maxSizeNum);
-        }
-
-        setSize(newSize);
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({ currentSize: newSize, previousSize: newSize })
-        );
-        if (onResize) {
-          onResize(newSize);
-        }
-
-        setStartMousePos({ x: e.clientX, y: e.clientY });
-      }
-    },
-    [
-      isResizing,
-      direction,
-      minSizeNum,
-      maxSizeNum,
-      onResize,
-      isHorizontal,
-      storageKey,
-      size,
-    ]
-  );
-
-  const toggleCollapse = useCallback(() => {
-    setSize((currentSize) => {
-      const storage = localStorage.getItem(storageKey);
-      let previousSize = currentSize;
-      if (storage) {
-        previousSize = JSON.parse(storage).previousSize;
-      }
-      const newSize = currentSize === minSizeNum ? previousSize : minSizeNum;
-      setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), animationDuration);
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({ currentSize: newSize, previousSize })
-      );
-      return newSize;
-    });
-  }, [minSizeNum, animationDuration, storageKey]);
-
-  const handleSliderMouseEnter = useCallback(() => {
-    setIsButtonVisible(true);
-  }, []);
-
-  const handleSliderMouseLeave = useCallback(() => {
-    setIsButtonVisible(false);
   }, []);
 
   useEffect(() => {
@@ -206,52 +87,127 @@ const ResizeableContainer: FC<Props> = ({
       }
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleMouseMove, handleMouseUp, toggleCollapse, toggleKey]);
+  }, [toggleCollapse, toggleKey]);
+
+  const handleSliderMouseEnter = useCallback(() => {
+    setIsButtonVisible(true);
+  }, []);
+
+  const handleSliderMouseLeave = useCallback(() => {
+    setIsButtonVisible(false);
+  }, []);
+
+  const handleToggleButtonClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsToggleButtonClicked(true);
+      toggleCollapse();
+    },
+    [toggleCollapse]
+  );
+
+  const handleContainerMouseUp = useCallback(() => {
+    handleMouseUp(!isToggleButtonClicked);
+    setIsToggleButtonClicked(false);
+  }, [handleMouseUp, isToggleButtonClicked]);
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleContainerMouseUp);
+
+    return () => {
+      document.removeEventListener("mouseup", handleContainerMouseUp);
+    };
+  }, [handleContainerMouseUp]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleCollapse();
+      }
+    },
+    [toggleCollapse]
+  );
 
   return (
     <div
       ref={containerRef}
-      className={`${styles.container} ${isAnimating ? styles.animating : ""}`}
+      className={classNames(styles.container, containerClassName, {
+        [styles.animating]: isAnimating,
+      })}
       style={{
         [isHorizontal ? "width" : "height"]:
-          size !== null ? `${size}px` : "auto",
+          size !== null ? `${size}px` : `${maxSize}px`,
         transition: isAnimating
           ? `${
               isHorizontal ? "width" : "height"
             } ${animationDuration}ms ease-in-out`
           : "none",
       }}
+      role="region"
+      aria-label={ariaLabel}
     >
-      {children}
+      <div className={classNames(styles.childWrapper, childWrapperClassName)}>
+        {children}
+      </div>
       <div
-        className={`${styles.slider} ${styles[direction]}`}
+        className={classNames(
+          styles.slider,
+          styles[direction],
+          sliderClassName
+        )}
         onMouseEnter={handleSliderMouseEnter}
         onMouseLeave={handleSliderMouseLeave}
+        onMouseDown={handleMouseDown}
+        role="separator"
+        aria-valuenow={Number(size)}
+        aria-valuemin={Number(minSize)}
+        aria-valuemax={Number(maxSize)}
+        aria-orientation={isHorizontal ? "horizontal" : "vertical"}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
       >
-        <div className={styles.resizer} onMouseDown={handleMouseDown}>
-          <span></span>
-        </div>
+        <div className={styles.resizer} aria-hidden="true"></div>
         <button
-          className={`${styles.toggleButton} ${
-            !isButtonVisible ? styles.hidden : ""
-          }`}
-          onClick={toggleCollapse}
+          ref={toggleButtonRef}
+          className={classNames(styles.toggleButton, toggleButtonClassName, {
+            [styles.hidden]: !isButtonVisible,
+          })}
+          onClick={handleToggleButtonClick}
+          aria-label={`Toggle ${direction} panel`}
+          aria-expanded={size !== minSize}
         >
-          {">"}
+          <i
+            className={getIconClass(size === minSize, direction)}
+            aria-hidden="true"
+          ></i>
         </button>
-        <div className={styles.shadow} />
+        <div className={styles.shadow} aria-hidden="true" />
       </div>
     </div>
   );
 };
 
-export default ResizeableContainer;
+export default ResizableContainer;
+
+const getIconClass = (isCollapsed: boolean, direction: string): string => {
+  const baseClass = "fas fa-chevron-";
+
+  switch (direction) {
+    case "right":
+      return `${baseClass}${isCollapsed ? "right" : "left"}`;
+    case "left":
+      return `${baseClass}${isCollapsed ? "left" : "right"}`;
+    case "top":
+      return `${baseClass}${isCollapsed ? "up" : "down"}`;
+    case "bottom":
+      return `${baseClass}${isCollapsed ? "down" : "up"}`;
+    default:
+      return `${baseClass}right`;
+  }
+};

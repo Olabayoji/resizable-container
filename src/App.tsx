@@ -9,7 +9,6 @@ function App() {
         minSize={24}
         maxSize={500}
         boundSize={300}
-        onResize={(size) => {}}
         storageKey="resizeable-container"
         toggleKey="["
       >
