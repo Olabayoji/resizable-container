@@ -7,7 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import styles from "./ResizeableContainer.module.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 type Props = {
   children: ReactNode;
   direction?: "right" | "left" | "top" | "bottom";
@@ -41,6 +41,7 @@ const ResizeableContainer: FC<Props> = ({
     x: number;
     y: number;
   } | null>(null);
+  const [isButtonVisible, setIsButtonVisible] = useState(true);
 
   const minSizeNum =
     typeof minSize === "string" ? parseInt(minSize, 10) : minSize || 0;
@@ -88,6 +89,15 @@ const ResizeableContainer: FC<Props> = ({
     }
   }, [direction, boundSizeNum, isHorizontal, storageKey, initialSize]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsButtonVisible(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  console.log(isButtonVisible);
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -177,6 +187,14 @@ const ResizeableContainer: FC<Props> = ({
     });
   }, [minSizeNum, animationDuration, storageKey]);
 
+  const handleSliderMouseEnter = useCallback(() => {
+    setIsButtonVisible(true);
+  }, []);
+
+  const handleSliderMouseLeave = useCallback(() => {
+    setIsButtonVisible(false);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -214,11 +232,20 @@ const ResizeableContainer: FC<Props> = ({
       }}
     >
       {children}
-      <div className={`${styles.slider} ${styles[direction]}`}>
+      <div
+        className={`${styles.slider} ${styles[direction]}`}
+        onMouseEnter={handleSliderMouseEnter}
+        onMouseLeave={handleSliderMouseLeave}
+      >
         <div className={styles.resizer} onMouseDown={handleMouseDown}>
           <span></span>
         </div>
-        <button className={styles.toggleButton} onClick={toggleCollapse}>
+        <button
+          className={`${styles.toggleButton} ${
+            !isButtonVisible ? styles.hidden : ""
+          }`}
+          onClick={toggleCollapse}
+        >
           {">"}
         </button>
         <div className={styles.shadow} />
