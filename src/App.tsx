@@ -1,12 +1,12 @@
 import ResizeableContainer from "./components/ResizeableContainer";
-import styles from "./App.module.css";
+import styles from "./App.module.scss";
 
 function App() {
   return (
-    <>
+    <div className={styles.outerContainer}>
       <ResizeableContainer
         direction="right"
-        minSize={24}
+        minSize={0}
         maxSize={500}
         boundSize={300}
         storageKey="resizeable-container"
@@ -14,7 +14,7 @@ function App() {
       >
         <div className={styles.container}>Hello world</div>
       </ResizeableContainer>
-    </>
+    </div>
   );
 }
 

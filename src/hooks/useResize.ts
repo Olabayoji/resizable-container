@@ -1,39 +1,52 @@
-// src/hooks/useResize.ts
+import { useState, useEffect, useCallback, useRef } from "react";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+/**
+ * Interface for the options used in the `useResize` hook.
+ */
+interface UseResizeOptions {
+  direction?: "right" | "left" | "bottom" | "top"; // The direction of the resizable container
+  initialSize?: number | string; // The initial size of the container
+  minSize?: number | string; // The minimum size of the container
+  maxSize?: number | string; // The maximum size of the container
+  boundSize?: number | string; // The bound size of the container
+  onResize?: (size: number) => void; // Callback function for when the container is resized
+  animationDuration?: number; // The duration of the animation when the container is collapsed
+  storageKey: string; // The key used to store the container size in localStorage
+}
 
-type UseResizeProps = {
-  direction: "right" | "left" | "top" | "bottom";
-  initialSize?: number | string;
-  minSize?: number | string;
-  maxSize?: number | string;
-  boundSize?: number | string;
-  onResize?: (size: number) => void;
-  animationDuration: number;
-  storageKey: string;
-};
-
-export const useResize = ({
-  direction,
+/**
+ * A custom hook that manages the resizing logic for a resizable container.
+ *
+ * @param {UseResizeOptions} options - The options for the `useResize` hook.
+ * @returns {Object} - The resizing-related state and functions.
+ */
+const useResize = ({
+  direction = "right",
   initialSize,
   minSize,
   maxSize,
   boundSize,
   onResize,
-  animationDuration,
+  animationDuration = 300,
   storageKey,
-}: UseResizeProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<number | null>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+}: UseResizeOptions) => {
+  const containerRef = useRef<HTMLDivElement>(null); // Reference to the container element
+  const [size, setSize] = useState<number | null>(() => {
+    // Get the stored size from localStorage, or use the initialSize if it's not stored
+    const storedData = localStorage.getItem(storageKey);
+    if (storedData) {
+      return JSON.parse(storedData).currentSize;
+    }
+    return initialSize || 0; // Use the initialSize if it's provided, or default to 0
+  });
+  const [isResizing, setIsResizing] = useState(false); // Whether the container is currently being resized
+  const [isAnimating, setIsAnimating] = useState(false); // Whether the container is currently animating
   const [startMousePos, setStartMousePos] = useState<{
     x: number;
     y: number;
-  } | null>(null);
+  } | null>(null); // The starting mouse position during a resize
 
-  const isHorizontal = direction === "right" || direction === "left";
-
+  // Convert minSize, maxSize, and boundSize to numbers if they are strings
   const minSizeNum =
     typeof minSize === "string" ? parseInt(minSize, 10) : minSize || 0;
   const maxSizeNum =
@@ -41,43 +54,9 @@ export const useResize = ({
   const boundSizeNum =
     typeof boundSize === "string" ? parseInt(boundSize, 10) : boundSize || 0;
 
-  useEffect(() => {
-    const storedData = localStorage.getItem(storageKey);
-    let storedSize: number | null = null;
-    let storedPreviousSize: number | null = null;
+  const isHorizontal = direction === "right" || direction === "left"; // Whether the container is resizable horizontally
 
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      storedSize = parsedData.currentSize || null;
-      storedPreviousSize = parsedData.previousSize || null;
-    }
-
-    if (containerRef.current) {
-      const containerSize = isHorizontal
-        ? containerRef.current.offsetWidth
-        : containerRef.current.offsetHeight;
-      const initialSizeNum =
-        storedSize !== null
-          ? storedSize
-          : initialSize !== undefined
-          ? typeof initialSize === "string"
-            ? parseInt(initialSize, 10)
-            : initialSize
-          : Math.max(containerSize, boundSizeNum);
-
-      setSize(initialSizeNum);
-      if (storedPreviousSize === null) {
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            currentSize: initialSizeNum,
-            previousSize: initialSizeNum,
-          })
-        );
-      }
-    }
-  }, [direction, boundSizeNum, isHorizontal, storageKey, initialSize]);
-
+  // Handle mouse down event to start resizing
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -85,37 +64,40 @@ export const useResize = ({
     setStartMousePos({ x: e.clientX, y: e.clientY });
   }, []);
 
+  // Handle mouse up event to stop resizing
   const handleMouseUp = useCallback(
-    (shouldUpdateSize: boolean = true) => {
-      console.log("handleMouseUp"), setIsResizing(false);
-      if (shouldUpdateSize) {
-        setSize((currentSize) => {
-          if (currentSize !== null) {
-            const newSize =
-              currentSize < boundSizeNum ? minSizeNum : currentSize;
-            localStorage.setItem(
-              storageKey,
-              JSON.stringify({
-                currentSize: newSize,
-                previousSize: Math.max(newSize, boundSizeNum),
-              })
-            );
-            if (currentSize < boundSizeNum) {
-              setIsAnimating(true);
-              setTimeout(() => setIsAnimating(false), animationDuration);
-              return minSizeNum;
-            }
-          }
-          return currentSize;
-        });
+    (shouldExecute: boolean = true) => {
+      if (!shouldExecute) {
+        setIsResizing(false);
+        return;
       }
+
+      setIsResizing(false);
+      setSize((currentSize) => {
+        if (currentSize !== null) {
+          const newSize = currentSize < boundSizeNum ? minSizeNum : currentSize;
+          localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+              currentSize: newSize,
+              previousSize: Math.max(newSize, boundSizeNum),
+            })
+          );
+          if (currentSize < boundSizeNum) {
+            setIsAnimating(true);
+            setTimeout(() => setIsAnimating(false), animationDuration);
+            return minSizeNum;
+          }
+        }
+        return currentSize;
+      });
     },
     [storageKey, boundSizeNum, animationDuration, minSizeNum]
   );
 
+  // Handle mouse move event during resizing
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      console.log("handleMouseMove");
       if (isResizing && containerRef.current && startMousePos) {
         const offsetX = e.clientX - startMousePos.x;
         const offsetY = e.clientY - startMousePos.y;
@@ -135,7 +117,10 @@ export const useResize = ({
         setSize(newSize);
         localStorage.setItem(
           storageKey,
-          JSON.stringify({ currentSize: newSize, previousSize: newSize })
+          JSON.stringify({
+            currentSize: newSize,
+            previousSize: newSize,
+          })
         );
         if (onResize) {
           onResize(newSize);
@@ -146,17 +131,18 @@ export const useResize = ({
     },
     [
       isResizing,
-      direction,
+      startMousePos,
+      isHorizontal,
       minSizeNum,
       maxSizeNum,
-      onResize,
-      isHorizontal,
       storageKey,
+      onResize,
       size,
-      startMousePos,
+      direction,
     ]
   );
 
+  // Handle the toggle collapse functionality
   const toggleCollapse = useCallback(() => {
     setSize((currentSize) => {
       const storage = localStorage.getItem(storageKey);
@@ -175,21 +161,25 @@ export const useResize = ({
     });
   }, [minSizeNum, animationDuration, storageKey]);
 
+  // Add event listener for mouse move during resizing
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [handleMouseMove, handleMouseUp]);
+  }, [handleMouseMove]);
 
   return {
     containerRef,
     size,
     isAnimating,
     handleMouseDown,
-    handleMouseUp,
     toggleCollapse,
     isHorizontal,
+    handleMouseUp,
+    isResizing,
   };
 };
+
+export default useResize;

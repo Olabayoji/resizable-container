@@ -8,26 +8,36 @@ import React, {
 } from "react";
 import classNames from "classnames";
 import styles from "./ResizeableContainer.module.scss";
-import { useResize } from "../hooks/useResize";
+import useResize from "../hooks/useResize";
 
+/**
+ * The props for the ResizableContainer component.
+ */
 type Props = {
   children: ReactNode;
   direction?: "right" | "left" | "top" | "bottom";
-  toggleKey?: string;
-  initialSize?: number | string;
-  minSize?: number | string;
-  maxSize?: number | string;
-  boundSize?: number | string;
-  onResize?: (size: number) => void;
-  animationDuration?: number;
-  storageKey: string;
-  ariaLabel?: string;
-  containerClassName?: string;
-  childWrapperClassName?: string;
-  sliderClassName?: string;
-  toggleButtonClassName?: string;
+  toggleKey?: string; // The key that triggers the toggle collapse functionality
+  initialSize?: number | string; // The initial size of the container
+  minSize?: number | string; // The minimum size of the container
+  maxSize?: number | string; // The maximum size of the container
+  boundSize?: number | string; // The bound size of the container
+  onResize?: (size: number) => void; // Callback function for when the container is resized
+  animationDuration?: number; // The duration of the animation when the container is collapsed
+  storageKey: string; // The key used to store the container size in localStorage
+  ariaLabel?: string; // The aria-label for the container
+  containerClassName?: string; // Additional CSS class for the container
+  childWrapperClassName?: string; // Additional CSS class for the child wrapper
+  sliderClassName?: string; // Additional CSS class for the slider
+  toggleButtonClassName?: string; // Additional CSS class for the toggle button
+  toggleButtonIcon?: ReactNode; // The icon for the toggle button
 };
 
+/**
+ * A resizable container component that can be collapsed and expanded.
+ *
+ * @param {Props} props - The props for the ResizableContainer component.
+ * @returns {JSX.Element} - The ResizableContainer component.
+ */
 const ResizableContainer: FC<Props> = ({
   children,
   direction = "right",
@@ -44,7 +54,9 @@ const ResizableContainer: FC<Props> = ({
   childWrapperClassName,
   sliderClassName,
   toggleButtonClassName,
+  toggleButtonIcon,
 }) => {
+  // Use the custom useResize hook to manage the resizing logic
   const {
     containerRef,
     size,
@@ -53,6 +65,7 @@ const ResizableContainer: FC<Props> = ({
     handleMouseUp,
     toggleCollapse,
     isHorizontal,
+    isResizing,
   } = useResize({
     direction,
     initialSize,
@@ -64,10 +77,13 @@ const ResizableContainer: FC<Props> = ({
     storageKey,
   });
 
+  // State to track the visibility of the toggle button
   const [isButtonVisible, setIsButtonVisible] = useState(true);
+  // State to track whether the toggle button was clicked
   const [isToggleButtonClicked, setIsToggleButtonClicked] = useState(false);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Hide the toggle button after 5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsButtonVisible(false);
@@ -76,6 +92,7 @@ const ResizableContainer: FC<Props> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  // Add a keyboard event listener to toggle the container on Ctrl + [toggleKey]
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -94,14 +111,17 @@ const ResizableContainer: FC<Props> = ({
     };
   }, [toggleCollapse, toggleKey]);
 
+  // Show the toggle button when the slider is hovered over
   const handleSliderMouseEnter = useCallback(() => {
     setIsButtonVisible(true);
   }, []);
 
+  // Hide the toggle button when the slider is no longer hovered over
   const handleSliderMouseLeave = useCallback(() => {
     setIsButtonVisible(false);
   }, []);
 
+  // Handle the click event on the toggle button
   const handleToggleButtonClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -111,11 +131,13 @@ const ResizableContainer: FC<Props> = ({
     [toggleCollapse]
   );
 
+  // Handle the mouseup event on the container
   const handleContainerMouseUp = useCallback(() => {
     handleMouseUp(!isToggleButtonClicked);
     setIsToggleButtonClicked(false);
   }, [handleMouseUp, isToggleButtonClicked]);
 
+  // Add a mouseup event listener to the document to handle container mouseup
   useEffect(() => {
     document.addEventListener("mouseup", handleContainerMouseUp);
 
@@ -124,6 +146,7 @@ const ResizableContainer: FC<Props> = ({
     };
   }, [handleContainerMouseUp]);
 
+  // Handle the keydown event on the slider
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -134,6 +157,7 @@ const ResizableContainer: FC<Props> = ({
     [toggleCollapse]
   );
 
+  // Render the ResizableContainer component
   return (
     <div
       ref={containerRef}
@@ -182,32 +206,20 @@ const ResizableContainer: FC<Props> = ({
           aria-label={`Toggle ${direction} panel`}
           aria-expanded={size !== minSize}
         >
-          <i
-            className={getIconClass(size === minSize, direction)}
-            aria-hidden="true"
-          ></i>
+          {toggleButtonIcon}
         </button>
-        <div className={styles.shadow} aria-hidden="true" />
+        <div
+          className={classNames(
+            styles.shadow,
+            (size || 0) <= Number(boundSize || 0) &&
+              isResizing &&
+              styles.infoShadow
+          )}
+          aria-hidden="true"
+        />
       </div>
     </div>
   );
 };
 
 export default ResizableContainer;
-
-const getIconClass = (isCollapsed: boolean, direction: string): string => {
-  const baseClass = "fas fa-chevron-";
-
-  switch (direction) {
-    case "right":
-      return `${baseClass}${isCollapsed ? "right" : "left"}`;
-    case "left":
-      return `${baseClass}${isCollapsed ? "left" : "right"}`;
-    case "top":
-      return `${baseClass}${isCollapsed ? "up" : "down"}`;
-    case "bottom":
-      return `${baseClass}${isCollapsed ? "down" : "up"}`;
-    default:
-      return `${baseClass}right`;
-  }
-};
