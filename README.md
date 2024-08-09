@@ -42,7 +42,7 @@ const MyComponent = () => {
     </ResizableContainer>
   );
 };
-
+```
 # ResizableContainer Component
 
 The `ResizableContainer` component accepts the following props:
