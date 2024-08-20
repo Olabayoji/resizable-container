@@ -7,7 +7,7 @@ import React, {
   useRef,
 } from "react";
 import classNames from "classnames";
-import styles from "./ResizeableContainer.module.scss";
+import styles from "./ResizableContainer.module.scss";
 import useResize from "../hooks/useResize";
 
 /**

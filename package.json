@@ -1,22 +1,31 @@
 {
   "name": "resizable-container",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "1.0.0",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
+    "build": "babel src --out-dir dist --extensions \".ts,.tsx\" && tsc --declaration --emitDeclarationOnly",
     "dev": "vite",
-    "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.6.0",
-    "@fortawesome/react-fontawesome": "^0.2.2",
     "classnames": "^2.5.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "resizable-container": "file:resizable-container-1.0.0.tgz"
   },
   "devDependencies": {
+    "@babel/cli": "^7.24.8",
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-runtime": "^7.24.7",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__plugin-transform-runtime": "^7.9.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
@@ -28,5 +37,29 @@
     "sass": "^1.77.8",
     "typescript": "^5.2.2",
     "vite": "^5.3.4"
-  }
+  },
+  "description": "A resizable and collapsible container component for React applications.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Olabayoji/resizable-container.git"
+  },
+  "keywords": [
+    "react",
+    "resizable",
+    "container",
+    "collapsible",
+    "component",
+    "layout",
+    "responsive",
+    "draggable",
+    "resize",
+    "toggle",
+    "react-component"
+  ],
+  "author": "Olabayoji Oladepo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Olabayoji/resizable-container/issues"
+  },
+  "homepage": "https://github.com/Olabayoji/resizable-container#readme"
 }

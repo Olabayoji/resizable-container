@@ -2,6 +2,8 @@
 
 A resizable and collapsible container component for React applications.
 
+![Resizable Container Demo](src/assets/resizeable_container_demo.gif)
+
 ## Table of Contents
 
 - [ResizableContainer](#resizablecontainer)

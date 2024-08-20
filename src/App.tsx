@@ -1,19 +1,23 @@
-import ResizeableContainer from "./components/ResizeableContainer";
 import styles from "./App.module.scss";
+import ResizableContainer from "./components/ResizableContainer";
 
 function App() {
   return (
     <div className={styles.outerContainer}>
-      <ResizeableContainer
+      <ResizableContainer
         direction="right"
-        minSize={0}
-        maxSize={500}
-        boundSize={300}
+        minSize={24}
+        maxSize={200}
+        boundSize={50}
         storageKey="resizeable-container"
         toggleKey="["
+        childWrapperClassName={styles.childWrapper}
+        containerClassName={styles.containerTest}
       >
-        <div className={styles.container}>Hello world</div>
-      </ResizeableContainer>
+        <div className={styles.container}>
+          <ul></ul>
+        </div>
+      </ResizableContainer>
     </div>
   );
 }
