@@ -203,7 +203,6 @@ export const WithCustomStyle: Story = {
   args: {
     storageKey: "storybook-resizable-container-styled",
     containerClassName: "custom-container",
-    childrenWrapperClassName: "custom-wrapper",
     sliderClassName: "custom-slider",
     toggleButtonClassName: "custom-toggle",
   },
