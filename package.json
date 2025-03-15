@@ -9,13 +9,17 @@
     "build": "babel src --out-dir dist --extensions \".ts,.tsx\" && tsc --declaration --emitDeclarationOnly",
     "dev": "vite",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "bundle": "tsup src/index.tsx --minify --format cjs,esm --legacy-output dist/index.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "deploy-storybook": "gh-pages -d storybook-static",
+    "prepublishOnly": "tsup"
   },
   "dependencies": {
     "classnames": "^2.5.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "resizable-container": "file:resizable-container-1.0.0.tgz"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.8",
@@ -24,24 +28,39 @@
     "@babel/preset-env": "^7.25.3",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@chromatic-com/storybook": "^3.2.6",
+    "@storybook/addon-essentials": "^8.6.6",
+    "@storybook/addon-onboarding": "^8.6.6",
+    "@storybook/blocks": "^8.6.6",
+    "@storybook/experimental-addon-test": "^8.6.6",
+    "@storybook/react": "^8.6.6",
+    "@storybook/react-vite": "^8.6.6",
+    "@storybook/test": "^8.6.6",
     "@types/babel__core": "^7.20.5",
     "@types/babel__plugin-transform-runtime": "^7.9.5",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/browser": "^3.0.8",
+    "@vitest/coverage-v8": "^3.0.8",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "eslint-plugin-storybook": "^0.11.4",
+    "playwright": "^1.51.0",
     "sass": "^1.77.8",
+    "storybook": "^8.6.6",
+    "tsup": "^8.4.0",
     "typescript": "^5.2.2",
-    "vite": "^5.3.4"
+    "vite": "^5.3.4",
+    "vitest": "^3.0.8"
   },
   "description": "A resizable and collapsible container component for React applications.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Olabayoji/resizable-container.git"
+    "url": "https://github.com/Olabayoji/resizable-container.git"
   },
   "keywords": [
     "react",
@@ -58,6 +77,7 @@
   ],
   "author": "Olabayoji Oladepo",
   "license": "ISC",
+  
   "bugs": {
     "url": "https://github.com/Olabayoji/resizable-container/issues"
   },

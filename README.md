@@ -63,10 +63,10 @@ The `ResizableContainer` component accepts the following props:
 | `storageKey`              | `string`                                    | -         | The key used to store the container size in `localStorage`.                                   |
 | `ariaLabel`               | `string`                                    | -         | The `aria-label` for the container.                                                           |
 | `containerClassName`      | `string`                                    | -         | Additional CSS class for the container.                                                       |
-| `childWrapperClassName`   | `string`                                    | -         | Additional CSS class for the child wrapper.                                                   |
+
 | `sliderClassName`         | `string`                                    | -         | Additional CSS class for the slider.                                                          |
 | `toggleButtonClassName`   | `string`                                    | -         | Additional CSS class for the toggle button.                                                   |
-| `toggleButtonIcon`        | `string`                                    | -         | The icon for the toggle button                                                                |
+| `toggleButtonIcon`        | `string`                                    | `[`        | The icon for the toggle button                                                                |
 
 
 ## Keyboard Shortcuts

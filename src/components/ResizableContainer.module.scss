@@ -1,15 +1,12 @@
-
 .container {
   position: relative;
-
-  .childWrapper {
-    position: relative;
-    width: inherit;
-    height: inherit;
-    overflow: hidden;
-  }
 }
-
+.childWrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: inherit;
+}
 .slider {
   position: absolute;
   opacity: 0.5;
@@ -24,6 +21,7 @@
 
     .toggleButton {
       opacity: 1;
+      z-index: 10;
     }
   }
 
@@ -40,22 +38,28 @@
 
   &.left {
     left: 0;
+    transform: translateX(-100%);
   }
 
   &.top,
   &.bottom {
     left: 0;
     right: 0;
-    height: 3px;
+    height: var(--resizer-width, 16px);
     cursor: ns-resize;
+    width: 100%;
   }
 
   &.top {
-    top: 0;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    top: auto;
   }
 
   &.bottom {
-    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    bottom: auto;
   }
 }
 
@@ -91,6 +95,9 @@
     bottom: 0;
     width: 3px;
     height: 100%;
+  }
+  .left & {
+    left: var(--resizer-width, 16px);
   }
 }
 
@@ -129,7 +136,7 @@
   }
 
   .left & {
-    transform: translateX(49%);
+    transform: translateX(calc(-49% + var(--resizer-width, 16px)));
   }
 
   .top &,
@@ -139,10 +146,10 @@
   }
 
   .top & {
-    bottom: 0;
+    bottom: 50%;
   }
 
   .bottom & {
-    top: 0;
+    top: 50%;
   }
 }

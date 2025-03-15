@@ -6,17 +6,15 @@ function App() {
     <div className={styles.outerContainer}>
       <ResizableContainer
         direction="right"
-        minSize={24}
-        maxSize={200}
-        boundSize={50}
-        storageKey="resizeable-container"
+        minSize={0}
+        maxSize={400}
+        boundSize={200}
+        storageKey="resizable-container"
         toggleKey="["
-        childWrapperClassName={styles.childWrapper}
         containerClassName={styles.containerTest}
+        childrenWrapperClassName={styles.childrenWrapper}
       >
-        <div className={styles.container}>
-          <ul></ul>
-        </div>
+        <div className={styles.container}>test</div>
       </ResizableContainer>
     </div>
   );
