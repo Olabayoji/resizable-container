@@ -64,8 +64,7 @@ The `ResizableContainer` component accepts the following props:
 | `animationDuration`       | `number`                                    | `300`     | The duration of the animation when the container is collapsed.                                |
 | `storageKey`              | `string`                                    | -         | The key used to store the container size in `localStorage`.                                   |
 | `ariaLabel`               | `string`                                    | -         | The `aria-label` for the container.                                                           |
-| `containerClassName`      | `string`                                    | -         | Additional CSS class for the container.                                                       |
-
+| `containerClassName`      | `string`                                    | -         | Additional CSS class for the container.                                                       | 
 | `sliderClassName`         | `string`                                    | -         | Additional CSS class for the slider.                                                          |
 | `toggleButtonClassName`   | `string`                                    | -         | Additional CSS class for the toggle button.                                                   |
 | `toggleButtonIcon`        | `string`                                    | `[`        | The icon for the toggle button                                                                |
