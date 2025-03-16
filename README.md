@@ -19,7 +19,9 @@ A resizable and collapsible container component for React applications.
 
 To use the `ResizableContainer` component in your React project, you can install it via npm or yarn:
 
-//add instalation script
+```bash
+npm i resizable-container
+```
 
 ## Usage
 
