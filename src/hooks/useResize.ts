@@ -1,18 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { UseResizeOptions } from "../types";
 
-interface UseResizeOptions {
-  direction?: "right" | "left" | "bottom" | "top";
-  initialSize?: number | string;
-  minSize?: number | string;
-  maxSize?: number | string;
-  boundSize?: number | string;
-  onResize?: (size: number) => void;
-  animationDuration?: number;
-  storageKey: string;
-  toggleKey?: string;
-}
 
-const useResize = ({
+
+export const useResize = ({
   direction = "right",
   initialSize,
   minSize,

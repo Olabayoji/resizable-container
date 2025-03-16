@@ -1,27 +1,10 @@
-import React, { FC, ReactNode, useCallback } from "react";
+import React, { FC, useCallback } from "react";
 import classNames from "classnames";
-import styles from "./ResizableContainer.module.scss";
+import styles from "./ResizableContainer.module.css";
 import useResize from "../hooks/useResize";
+import { ResizableContainerProps } from "../types";
 
-type Props = {
-  children: ReactNode;
-  direction?: "right" | "left" | "top" | "bottom";
-  toggleKey?: string;
-  initialSize?: number | string;
-  maxSize?: number | string;
-  minSize?: number | string;
-  boundSize?: number | string;
-  onResize?: (size: number) => void;
-  animationDuration?: number;
-  storageKey: string;
-  ariaLabel?: string;
-  containerClassName?: string;
-  sliderClassName?: string;
-  toggleButtonClassName?: string;
-  toggleButtonIcon?: ReactNode;
-};
-
-const ResizableContainer: FC<Props> = ({
+export const ResizableContainer: FC<ResizableContainerProps> = ({
   children,
   direction = "right",
   initialSize,

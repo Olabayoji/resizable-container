@@ -12,7 +12,6 @@ function App() {
         storageKey="resizable-container"
         toggleKey="["
         containerClassName={styles.containerTest}
-        childrenWrapperClassName={styles.childrenWrapper}
       >
         <div className={styles.container}>test</div>
       </ResizableContainer>

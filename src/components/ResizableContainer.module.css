@@ -1,0 +1,158 @@
+.container {
+  position: relative;
+}
+
+.childWrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: inherit;
+}
+
+.slider {
+  position: absolute;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  width: var(--resizer-width, 16px);
+  inset-block-end: 0;
+  inset-block-start: 0;
+  inset-inline-start: 100%;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider:hover .toggleButton {
+  opacity: 1;
+  z-index: 10;
+}
+
+.slider.right,
+.slider.left {
+  top: 0;
+  bottom: 0;
+  cursor: ew-resize;
+}
+
+.slider.right {
+  right: 0;
+}
+
+.slider.left {
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.slider.top,
+.slider.bottom {
+  left: 0;
+  right: 0;
+  height: var(--resizer-width, 16px);
+  cursor: ns-resize;
+  width: 100%;
+}
+
+.slider.top {
+  left: 50%;
+  transform: translate(-50%, 100%);
+  top: auto;
+}
+
+.slider.bottom {
+  left: 50%;
+  transform: translate(-50%, -100%);
+  bottom: auto;
+}
+
+.resizer {
+  width: 100%;
+  height: 100%;
+  cursor: inherit;
+}
+
+.resizer span {
+  display: block;
+  width: 3px;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+.resizer:hover span {
+  background-color: lightblue;
+}
+
+.animating {
+  transition-property: width, height;
+}
+
+.shadow {
+  position: absolute;
+  background-color: var(--resizer-color, hsl(214, 10%, 93%));
+}
+
+.right .shadow,
+.left .shadow {
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.left .shadow {
+  left: var(--resizer-width, 16px);
+}
+
+.toggleButton {
+  position: absolute;
+  background: none;
+  border: none;
+  color: #fff;
+  background-color: var(--primary-color, hsl(0, 0%, 16%));
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.toggleButton.hidden {
+  opacity: 0;
+}
+
+.toggleButton:hover {
+  color: hsla(0, 0%, 16%, 0.741);
+}
+
+.right .toggleButton,
+.left .toggleButton {
+  top: 1rem;
+}
+
+.right .toggleButton {
+  transform: translateX(-49%);
+}
+
+.left .toggleButton {
+  transform: translateX(calc(-49% + var(--resizer-width, 16px)));
+}
+
+.top .toggleButton,
+.bottom .toggleButton {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.top .toggleButton {
+  bottom: 50%;
+}
+
+.bottom .toggleButton {
+  top: 50%;
+}

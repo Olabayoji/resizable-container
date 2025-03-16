@@ -1,0 +1,15 @@
+/src
+/node_modules
+/public
+.env
+.eslintrc.cjs
+.eslintrc.js
+.DS_Store
+index.html
+tsconfig.json
+tsconfig.node.json
+tsconfig.app.json
+tsup.config.ts
+vite.config.ts
+.storybook/
+storybook-static/

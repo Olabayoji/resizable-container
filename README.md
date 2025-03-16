@@ -1,4 +1,4 @@
-# ResizableContainer
+# [ResizableContainer](https://olabayoji.github.io/resizable-container/)
 
 A resizable and collapsible container component for React applications.
 
@@ -26,7 +26,7 @@ To use the `ResizableContainer` component in your React project, you can install
 Import the `ResizableContainer` component and use it in your React application:
 
 ```jsx
-import ResizableContainer from '@your-org/resizable-container';
+import ResizableContainer from 'resizable-container';
 
 const MyComponent = () => {
   return (

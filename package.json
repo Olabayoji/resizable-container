@@ -4,13 +4,17 @@
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "babel src --out-dir dist --extensions \".ts,.tsx\" && tsc --declaration --emitDeclarationOnly",
+    "build": "tsc -b && vite build",
     "dev": "vite",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "bundle": "tsup src/index.tsx --minify --format cjs,esm --legacy-output dist/index.js",
+    "bundle": "tsup src/index.ts --minify --format cjs,esm --legacy-output dist/index.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy-storybook": "gh-pages -d storybook-static",
@@ -81,5 +85,5 @@
   "bugs": {
     "url": "https://github.com/Olabayoji/resizable-container/issues"
   },
-  "homepage": "https://github.com/Olabayoji/resizable-container#readme"
+  "homepage": "https://olabayoji.github.io/resizable-container/"
 }
